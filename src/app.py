@@ -4,8 +4,6 @@ from flask import send_from_directory
 from flask import url_for
 
 app = Flask(__name__)
-app.add_url_rule('/favicon.ico',
-                 redirect_to=url_for('static', filename='/img/icon.ico'))
 
 @app.route('/')
 def index():
