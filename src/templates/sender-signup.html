@@ -6,7 +6,7 @@
 {% endblock %}
 {% block body %}
 <h1>Sign up as a sender</h1>
-<form action="https://infinite-hamlet-29399.herokuapp.com/sender/register" method="POST" id="signup-form">
+<form action="https://infinite-hamlet-29399.herokuapp.com/sender/register" method="POST" id="signup-form" enctype="multipart/form-data">
     <ul>
         <li>
             <input type="text" id="firstname" name="firstname" placeholder="First Name">
@@ -34,7 +34,7 @@
         <span id="gender-message"></span>
         <li>
             <label for="photo">Upload your photo:</label>
-            <input type="file" name="photo" id="photo">
+            <input type="file" name="photo" id="photo" >
             <span id="photo-message"></span>
         </li>
         <li>
