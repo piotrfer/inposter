@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>Register a sender</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sender-signup.css') }}">
+{% endblock %}
+{% block body %}
+<h1>Sign up as a sender</h1>
+<form action="sender-signup">
+    <ul>
+        <li><input type="text" name="firstname" placeholder="First Name"></li>
+        <li><input type="text" name="lastname" placeholder="Last Name"></li>
+        <li><input type="text" name="login" placeholder="Login"></li>
+        <li><input type="password" name="password" placeholder="Password"></li>
+        <li><input type="password" name="repassword" placeholder="Confirm Password"></li>
+        <li><label for="Gender">Gender:</label>
+        <input type="radio" name="sex" value="male"><label for="male">Male</label>
+        <input type="radio" name="sex" value="female"><label for="female">Female</label></li>
+        <li>
+            <label for="photo">Upload your photo:</label>
+            <input type="file" name="photo" accept=".png,.jpg,.jpeg">
+        </li>
+        <li><button type="submit" href="#">Sign Up</button>
+    </ul>
+</form>
+{% endblock %}
