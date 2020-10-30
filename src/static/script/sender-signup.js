@@ -31,7 +31,7 @@ onLoginInput = function() {
         xhr.onreadystatechange = function () {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    if (xhr.response[loginForm.value] == "available") {
+                    if (JSON.parse(xhr.response)[loginForm.value] == "available") {
                         loginValidMessage.innerText = "Login is available"
                         loginValidMessage.className = "ok-message"
                     }
