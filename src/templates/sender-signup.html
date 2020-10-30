@@ -5,42 +5,48 @@
 <script src="{{ url_for('static', filename='script/sender-signup.js') }}"></script>
 {% endblock %}
 {% block body %}
-<h1>Sign up as a sender</h1>
-<form action="https://infinite-hamlet-29399.herokuapp.com/sender/register" method="POST" id="signup-form" enctype="multipart/form-data">
-    <ul>
-        <li>
-            <input type="text" id="firstname" name="firstname" placeholder="First Name">
-            <span id="firstname-message"></span>
-        </li>
-        <li>
-            <input type="text" id="lastname" name="lastname" placeholder="Last Name">
-            <span id="lastname-message"></span>
-        </li>
-        <li>
-            <input type="text" id="login" name="login" placeholder="Login">
-            <span id="login-message"></span>
-        </li>
-        <li>
-            <input type="password" id="password" name="password" placeholder="Password">
-            <span id="password-message"></span>
-        </li>
-        <li>
-            <input type="password" id="repassword" name="repassword" placeholder="Confirm Password">
-            <span id="repassword-message"></span>
-        </li>
-        <li><label for="Gender">Gender:</label>
-        <input type="radio" id="gender-male" name="sex" value="M" checked><label for="male">Male</label>
-        <input type="radio" id="gender-female"name="sex" value="F"><label for="female">Female</label></li>
-        <span id="gender-message"></span>
-        <li>
-            <label for="photo">Upload your photo:</label>
-            <input type="file" name="photo" id="photo" >
-            <span id="photo-message"></span>
-        </li>
-        <li>
-            <input id="submit-form"type="submit" value="Sign Up">
-            <span id="submit-message"></span>
-        </li>
-    </ul>
-</form>
+<div class="content">
+    <header>
+        Sign up as a sender
+    </header>
+    <form action="https://infinite-hamlet-29399.herokuapp.com/sender/register" method="POST" id="signup-form" enctype="multipart/form-data">
+        <ul>
+            <li>
+                <input type="text" id="firstname" name="firstname" placeholder="First Name">
+                <p id="firstname-message"></p>
+            </li>
+            <li>
+                <input type="text" id="lastname" name="lastname" placeholder="Last Name">
+                <p id="lastname-message"></p>
+            </li>
+            <li>
+                <input type="text" id="login" name="login" placeholder="Login">
+                <p id="login-message"></p>
+            </li>
+            <li>
+                <input type="password" id="password" name="password" placeholder="Password">
+                <p id="password-message"></p>
+            </li>
+            <li>
+                <input type="password" id="repassword" name="repassword" placeholder="Confirm Password">
+                <p id="repassword-message"></p>
+            </li>
+            <li><label for="Gender">Gender:</label>
+            <input type="radio" id="gender-male" name="sex" value="M" checked><label for="male">Male</label>
+            <input type="radio" id="gender-female"name="sex" value="F"><label for="female">Female</label></li>
+            <span id="gender-message"></span>
+            <li>
+                <div class="upload-btn-wrapper">
+                    <button class="btn">Upload photo</button>
+                    <input type="file" name="photo" id="photo">
+                  </div>
+                <p id="photo-message"></p>
+            </li>
+            <li>
+                <input id="submit-form"type="submit" value="Sign Up">
+                <span id="submit-message"></span>
+            </li>
+        </ul>
+    </form>
+</div>
 {% endblock %}

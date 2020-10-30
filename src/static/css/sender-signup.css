@@ -2,6 +2,67 @@ form ul li{
     list-style-type: none;
 }
 
+header {
+    text-align: center;
+    margin-top: 5%;
+    padding: 20px;
+    font-size: 50px;
+    font-weight: bolder;
+}
+
+form {
+    margin-top: 5%;
+    text-align: center;
+}
+
+form ul {
+    margin: 5px 5px;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+}
+
+input {
+    box-sizing: border-box;
+    padding: 20px 20px;
+    margin: 5px 15px;
+    border-radius: 15px;
+    border: 1px solid grey;
+}
+
+input:hover {
+    border-color: #272C28;
+    box-shadow: 5px;
+    color: #272C28;
+}
+
+.upload-btn-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    padding: 10px;
+}
+  
+.btn {
+    border: 1px solid gray;
+    background-color: white;
+    color: inherit;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: grab;
+}
+
+.upload-btn-wrapper input[type=file] {
+    font-size: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+}
+
+
 .ok-message {
     color: green;
 }

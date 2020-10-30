@@ -2,9 +2,16 @@
 
 {% block head %}
 <title>InPoster Home</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css')}}">
 {% endblock %}
 
 {% block body %}
-<h1>InPoster</h1>
-<h1>There is only 1 InPoster among us</h1>
+<header>
+    <h1>InPoster</h1>
+    <h2>there is only one InPoster among us</h2>
+</header>
+<section class="content">
+    <img class="image-logo" src="{{ url_for('static', filename='img/inPoster.png') }}" alt="InPoster">
+</section>
+
 {% endblock %}

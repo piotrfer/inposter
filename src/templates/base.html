@@ -9,15 +9,18 @@
 </head>
 <body>
     <nav>
-        <ul>
-            <li><a href="/">InPoster</a></li>
-            <li><a href="/sender/sign-up">Sender - Register</a></li>
+        <ul class="menu">
+            <li class="item"><a href="/">Home</a></li>
+            <li class="item"><a href="/sender/sign-up">Sender - Register</a></li>
         </ul>
     </nav>
     {% block body %}{% endblock %}
 </body>
 <footer>
-    <p>2020</p>
-    <p><a href="https://github.com/piotrfer/inposter">Repository</a></p>
+    <ul>
+        <li>2020</li>
+        <li>Piotr Ferdynus</li>
+        <li><a href="https://github.com/piotrfer/inposter">GitHub</a></li>
+    </ul>
 </footer>
 </html>

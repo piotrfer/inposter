@@ -1,11 +1,74 @@
-nav {
+@import url('https://fonts.googleapis.com/css2?family=Lato&display=swap');
+
+html, body {
+    overflow: auto;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    color: #272C28;
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+nav, footer {
+    justify-content: space-evenly;
+    align-items: center;
+    display: flex;
+    background-color: #272C28;
     align-items: center;
 }
 
-nav ul li{
-    display: inline;
+nav ul, footer ul {
+    color: #f1f1f1;
+    list-style: none;
+    margin: 0;
 }
 
-ul li {
-    padding: 10px;
+nav ul li {
+    box-sizing: border-box;
+    letter-spacing: 2px;
+    display: inline-block;
+    padding: 5px 50px;
+    margin: 10px;
+}
+
+.item a:hover {
+    font-weight: bolder;
+    border-bottom: 2px solid white;
+}
+
+footer {
+    background-color: #272C28;
+    color: white;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    font-style: italic;
+}
+
+footer ul {
+    margin: 5px;
+    padding: 0;
+}
+
+footer ul li {
+    font-size: smaller;
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 1px 20px;
+}
+
+footer img {
+    height: 15px;
+}
+
+.content {
+    width: 60%;
+    margin: auto;
 }
