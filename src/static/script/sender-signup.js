@@ -1,15 +1,15 @@
 window.onload = function() {
-    console.log("added script correctly")
     document.getElementById("login").addEventListener("input", onLoginInput)
     document.getElementById("firstname").addEventListener("change", onFirstnameChange)
     document.getElementById("lastname").addEventListener("change", onLastnameChange)
     document.getElementById("password").addEventListener("change", onPasswordChange)
     document.getElementById("repassword").addEventListener("change", onRepasswordChange)
+    document.getElementById("photo").addEventListener("change", onPhotoChange)
 }
 
 onLoginInput = function() {
     var loginForm = document.getElementById("login")
-    var loginValidMessage = document.getElementById("login-valid-message")
+    var loginValidMessage = document.getElementById("login-message")
     var minLength = 3
     var maxLength = 12
     
@@ -50,17 +50,68 @@ onLoginInput = function() {
 }
 
 onFirstnameChange = function() {
-    console.log("This will validate firstname")
+    var criteria = new RegExp("[A-Z{ĄĆĘŁŃÓŚŹŻ}][a-z{ąćęłńóśźż}]+")
+    var firstnameForm = document.getElementById("firstname")
+    var firstnameMessage = document.getElementById("firstname-message")
+
+    firstnameMessage.innerText = ""
+
+    if (!criteria.test(firstnameForm.value) && firstnameForm.value != "") {
+        firstnameMessage.innerText = "The name should start at capital letter and only contains letters"
+        firstnameMessage.className = "error-message"
+    }
 }
 
 onLastnameChange = function() {
-    console.log("This will validate lastname")
+    var criteria = new RegExp("[A-Z{ĄĆĘŁŃÓŚŹŻ}][a-z{ąćęłńóśźż}]+")
+    var lastnameForm = document.getElementById("lastname")
+    var lastnameMessage = document.getElementById("lastname-message")
+
+    lastnameMessage.innerText = ""
+
+    if (!criteria.test(lastnameForm.value) && lastnameForm.value != "") {
+        lastnameMessage.innerText = "The last name should start at capital letter and only contains letters"
+        lastnameMessage.className = "error-message"
+    }
+
 }
 
 onPasswordChange = function() {
-    console.log("This will validate password")
+    var criteria = new RegExp(".{8,}")
+    var passwordForm = document.getElementById("password")
+    var passwordMessage = document.getElementById("password-message")
+
+    passwordMessage.innerText = ""
+
+    if (!criteria.test(passwordForm.value) && passwordForm.value != "") {
+        passwordMessage.innerText = "Password has to be at least 8 characters long"
+        passwordMessage.className = "error-message"
+    }
+
 }
 
 onRepasswordChange = function() {
-    console.log("This will validate repassword")
+    var passwordForm = document.getElementById("password")
+    var repasswordForm = document.getElementById("repassword")
+    var repasswordMessage = document.getElementById("repassword-message")
+
+    repasswordMessage.innerText = ""
+
+    if( passwordForm.value != repasswordForm.value ) {
+        repasswordMessage.innerText = "The passwords are not identical!"
+        repasswordMessage.className = "error-message"
+    }
+}
+
+onPhotoChange = function() {
+    var photoForm = document.getElementById("photo")
+    var photoMessage = document.getElementById("photo-message")
+
+    photoMessage.innerText = ""
+
+    if(!/(\.png|\.jpg|\.jpeg)$/i.test(photoForm.value)) {
+        photoMessage.innerText = "You can only submit .png, .jpg and .jpeg files"
+        photoMessage.className = "error-message"
+    }
+
 }

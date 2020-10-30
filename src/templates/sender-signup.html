@@ -10,23 +10,37 @@
     <ul>
         <li>
             <input type="text" id="firstname" name="firstname" placeholder="First Name">
-            <span id="firstname-error"></span>
+            <span id="firstname-message"></span>
         </li>
-        <li><input type="text" id="lastname" name="lastname" placeholder="Last Name"></li>
+        <li>
+            <input type="text" id="lastname" name="lastname" placeholder="Last Name">
+            <span id="lastname-message"></span>
+        </li>
         <li>
             <input type="text" id="login" name="login" placeholder="Login">
-            <span id="login-valid-message"></span>
+            <span id="login-message"></span>
         </li>
-        <li><input type="password" id="password" name="password" placeholder="Password"></li>
-        <li><input type="password" id="repassword" name="repassword" placeholder="Confirm Password"></li>
+        <li>
+            <input type="password" id="password" name="password" placeholder="Password">
+            <span id="password-message"></span>
+        </li>
+        <li>
+            <input type="password" id="repassword" name="repassword" placeholder="Confirm Password">
+            <span id="repassword-message"></span>
+        </li>
         <li><label for="Gender">Gender:</label>
-        <input type="radio" name="sex" value="male"><label for="male">Male</label>
-        <input type="radio" name="sex" value="female"><label for="female">Female</label></li>
+        <input type="radio" id="gender-male" name="gender" value="male" checked><label for="male">Male</label>
+        <input type="radio" id="gender-female"name="gender" value="female"><label for="female">Female</label></li>
+        <span id="gender-message"></span>
         <li>
             <label for="photo">Upload your photo:</label>
-            <input type="file" name="photo" accept=".png,.jpg,.jpeg">
+            <input type="file" name="photo" id="photo" accept=".png,.jpg,.jpeg">
+            <span id="photo-message"></span>
         </li>
-        <li><button type="submit" href="#">Sign Up</button>
+        <li>
+            <button type="submit" href="#">Sign Up</button>
+            <span id="submit-message"></span>
+        </li>
     </ul>
 </form>
 {% endblock %}
