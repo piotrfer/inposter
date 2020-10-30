@@ -5,10 +5,7 @@ window.onload = function () {
     document.getElementById("password").addEventListener("change", onPasswordChange)
     document.getElementById("repassword").addEventListener("change", onRepasswordChange)
     document.getElementById("photo").addEventListener("change", onPhotoChange)
-    let signupForm = document.getElementById("signup-form")
-    let att = document.createAttribute("onsubmit")
-    att.value = "return onFormSubmit(event)"
-    signupForm.setAttributeNode(att)
+    document.getElementById("signup-form").addEventListener("submit", onFormSubmit)
 }
 
 var valid = {
