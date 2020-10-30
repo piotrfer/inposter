@@ -8,9 +8,15 @@
 <h1>Sign up as a sender</h1>
 <form action="sender-signup">
     <ul>
-        <li><input type="text" id="firstname" name="firstname" placeholder="First Name"></li>
+        <li>
+            <input type="text" id="firstname" name="firstname" placeholder="First Name">
+            <span id="firstname-error"></span>
+        </li>
         <li><input type="text" id="lastname" name="lastname" placeholder="Last Name"></li>
-        <li><input type="text" id="login" name="login" placeholder="Login"></li>
+        <li>
+            <input type="text" id="login" name="login" placeholder="Login">
+            <span id="login-valid-message"></span>
+        </li>
         <li><input type="password" id="password" name="password" placeholder="Password"></li>
         <li><input type="password" id="repassword" name="repassword" placeholder="Confirm Password"></li>
         <li><label for="Gender">Gender:</label>

@@ -1,3 +1,11 @@
 form ul li{
     list-style-type: none;
 }
+
+.ok-message {
+    color: green;
+}
+
+.error-message {
+    color: darkred;
+}

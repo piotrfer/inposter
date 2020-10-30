@@ -9,20 +9,42 @@ window.onload = function() {
 
 onLoginInput = function() {
     var loginForm = document.getElementById("login")
+    var loginValidMessage = document.getElementById("login-valid-message")
     var minLength = 3
-    var maxLenght = 12
+    var maxLength = 12
     
-    if (loginForm.value.length < minLength)
-        console.log("login too short")
-    else if (loginForm.value.length > maxLenght) {
-        console.log("login too long")
+    loginValidMessage.innerText = ""
+
+    if (loginForm.value.length < minLength) {
+        loginValidMessage.innerText = "Login must be at least " + minLength + " characters long"
+        loginValidMessage.className = "error-message"
+    }
+    else if (loginForm.value.length > maxLength) {
+        loginValidMessage.innerText = "Login must be maximum " + maxLength + " characters long"
+        loginValidMessage.className = "error-message"
     }
     else {
         console.log(loginForm.value)
-        xhr = new XMLHttpRequest()
+        var xhr = new XMLHttpRequest()
         console.log("sending get request")
         xhr.open("GET", "https://infinite-hamlet-29399.herokuapp.com/check/"+loginForm.value)
-        xhr.onreadystatechange = chceckLoginAvailability
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    if (xhr.response[loginForm.value] == "available") {
+                        loginValidMessage.innerText = "Login is available"
+                        loginValidMessage.className = "ok-message"
+                    }
+                    else {
+                        loginValidMessage.innerText = "Login is taken"
+                        loginValidMessage.className = "error-message"
+                    }
+                }
+                else {
+                    console.log("Something went wrong while checking the login availability")
+                }
+            }
+        }
         xhr.send()
     }
 }
@@ -41,8 +63,4 @@ onPasswordChange = function() {
 
 onRepasswordChange = function() {
     console.log("This will validate repassword")
-}
-
-chceckLoginAvailability = function() {
-    console.log(xhr)
 }
