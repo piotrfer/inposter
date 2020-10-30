@@ -6,7 +6,7 @@
 {% endblock %}
 {% block body %}
 <h1>Sign up as a sender</h1>
-<form action="sender-signup">
+<form action="https://infinite-hamlet-29399.herokuapp.com/sender/register" method="POST" id="signup-form">
     <ul>
         <li>
             <input type="text" id="firstname" name="firstname" placeholder="First Name">
@@ -38,7 +38,7 @@
             <span id="photo-message"></span>
         </li>
         <li>
-            <button type="submit" href="#">Sign Up</button>
+            <input id="submit-form"type="submit" value="Sign Up">
             <span id="submit-message"></span>
         </li>
     </ul>
