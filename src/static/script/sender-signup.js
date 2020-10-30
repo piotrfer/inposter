@@ -154,7 +154,7 @@ onPhotoChange = function () {
     valid["photo"] = false
 
     if (photo.value != "") {
-        if (!/(photo.png|photo.jpg|photo.jpeg)$/i.test(photoForm.value)) {
+        if (!/(\.png|\.jpg|\.jpeg)$/i.test(photoForm.value)) {
             photoMessage.innerText = "You can only submit .png, .jpg and .jpeg files"
             photoMessage.className = "error-message"
         }
