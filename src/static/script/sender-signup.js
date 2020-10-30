@@ -36,9 +36,7 @@ onLoginInput = function () {
             loginValidMessage.className = "error-message"
         }
         else {
-            console.log(loginForm.value)
             var xhr = new XMLHttpRequest()
-            console.log("sending get request")
             xhr.open("GET", "https://infinite-hamlet-29399.herokuapp.com/check/" + loginForm.value)
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4) {
@@ -150,14 +148,14 @@ onPhotoChange = function () {
     photoMessage.innerText = ""
     valid["photo"] = false
 
-    if (photo.value != "") {
-        if (!/(\.png|\.jpg|\.jpeg)$/i.test(photoForm.value)) {
-            photoMessage.innerText = "You can only submit .png, .jpg and .jpeg files"
-            photoMessage.className = "error-message"
-        }
-        else {
-            valid["photo"] = true
-        }
+    if (!/(\.png|\.jpg|\.jpeg)$/i.test(photoForm.value) || photoForm.value == "") {
+        photoMessage.innerText = "You can only submit .png, .jpg and .jpeg files"  
+        photoMessage.className = "error-message"
+    }
+    else {
+        photoMessage.innerText = photoForm.value
+        photoMessage.className = "ok-message"
+         valid["photo"] = true
     }
 }
 
@@ -166,5 +164,4 @@ onFormSubmit = function (e) {
     formValid = valid["firstname"] && valid["lastname"] && valid["login"] && valid["password"] && valid["repassword"] && valid["photo"]
     if (!formValid)
         e.preventDefault()
-    console.log(formValid)
 }

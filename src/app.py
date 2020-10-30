@@ -1,7 +1,6 @@
 from flask import Flask, render_template
 import os
 from flask import send_from_directory
-from flask import url_for
 
 app = Flask(__name__)
 
@@ -15,8 +14,8 @@ def sender_signup():
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'logo.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(os.path.join(app.root_path, 'static/img'), 'inPoster.png')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
     #app.run(debug=True, host='0.0.0.0', port=5000)
