@@ -133,12 +133,12 @@ def validate_signup_form(user):
     return valid
 
 def verify_user(login, given_password):
-    given_password = given_password.encode()
+    given_password = given_password.encode('utf-8')
     real_password = db.hget(f"user:{login}", "password")
     if not real_password:
         print(f"ERROR: not password for user {login}")
         return False
-    return real_password == given_password
+    return checkpw(given_password, real_password)
 
 
 def is_user(login):
@@ -150,7 +150,14 @@ def redirect(url, status=301):
     return response 
 
 def register_user(user):
-    db.hset(f"user:{user['login']}", "password", user["password"])
+    db.hset(f"user:{user['firstname']}", "firstname", user["firstname"])
+    db.hset(f"user:{user['lastname']}", "lastname", user["lastname"])
+    db.hset(f"user:{user['address']}", "address", user["address"])
+    db.hset(f"user:{user['email']}", "email", user["email"])
+    
+    hashed = hashpw(user["password"].encode('utf-8'), gensalt(5))
+    db.hset(f"user:{user['login']}", "password", hashed)
+
     return redirect(url_for('sender_login_get'))
 
 if __name__ == '__main__':
