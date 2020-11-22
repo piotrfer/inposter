@@ -1,20 +1,117 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, flash, make_response, url_for
+from flask_session import Session
 import os
 from flask import send_from_directory
+import re
+from bcrypt import gensalt, hashpw, checkpw
 
+from redis import Redis
+db = Redis(host='redis', port=6379, db=0) 
+
+from os import getenv
+from dotenv import load_dotenv
+
+load_dotenv()
+SESSION_TYPE='redis'
+SESSION_REDIS=db
 app = Flask(__name__)
+app.config.from_object(__name__)
+app.secret_key = getenv('SECRET_KEY')
+ses = Session(app)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/sender/sign-up/')
-def sender_signup():
+@app.route('/sender/sign-up/', methods=['GET'])
+def sender_signup_get():
     return render_template('sender-signup.html')
+
+@app.route('/sender/sign-up/', methods=['POST'])
+def sender_signup_post():
+    user = {}
+    user["firstname"] = request.form.get('firstname')
+    user["lastname"] = request.form.get('lastname')
+    user["login"] = request.form.get('login')
+    user["email"] = request.form.get('email')
+    user["password"] = request.form.get('password')
+    user["repassword"] = request.form.get('repassword')
+    user["address"] = request.form.get('address')
+
+    if validate_signup_form(user):
+        return register_user(user)
+    else:
+        return("invalid")
+        #redirect(url_for('index'))
 
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/img'), 'inPoster.png')
+
+
+def validate_signup_form(user):
+    PL = 'ĄĆĘŁŃÓŚŹŻ'
+    pl = 'ąćęłńóśźż'
+
+    valid = True
+    if not user["firstname"]:
+        valid = False
+        flash("No firstname provided")
+    elif not re.compile(f'[A-Z{PL}][a-z{pl}]+').match(user["firstname"]):
+        valid = False
+        flash("Invalid firstname provided")
+
+    if not user["lastname"]:
+        valid = False
+        flash("No lastname provided")
+    elif not re.compile(f'[A-Z{PL}][a-z{pl}]+').match(user["lastname"]):
+        valid = False
+        flash("Invalid lastname provided")
+
+    if not user["login"]:
+        valid = False
+        flash("No login provided")
+    elif not re.compile('[a-z]{3,12}').match(user["login"]):
+        valid = False
+        flash("Invalid lastname provided")
+
+    if not user["email"]:
+        valid = False
+        flash("No email provided")
+    elif not re.compile('^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$').match(user["email"]):
+        valid = False
+        flash("Invalid email provided")
+
+    if not user["password"]:
+        valid = False
+        flash("No password provided")
+    elif not re.compile('.{8,}').match(user["password"].strip()):
+        valid = False
+        flash("Invalid password provided")
+
+    if not user["repassword"]:
+        valid = False
+        flash("No repassword provided")
+    elif not user["password"] == user["repassword"]:
+        valid = False
+        flash("Invalid repassword provided")
+
+    if not user["address"]:
+        valid = False
+        flash("No address provided")
+    #regex should be added later
+    #check if exists in database should be added later
+
+    return valid
+
+def redirect(url, status=301):
+    response = make_response('', status)
+    response.headers['Location'] = url
+    return response 
+
+def register_user(user):
+    db.hset(f"user:{user['login']}", "password", user["password"])
+    return "REGISTERED"
 
 if __name__ == '__main__':
     app.run(debug=False)

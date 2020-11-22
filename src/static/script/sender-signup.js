@@ -162,6 +162,10 @@ onPhotoChange = function () {
 onFormSubmit = function (e) {
     var formValid = false;
     formValid = valid["firstname"] && valid["lastname"] && valid["login"] && valid["password"] && valid["repassword"] && valid["photo"]
+    
+    //only for development
+    formValid = true
+
     if (!formValid)
         e.preventDefault()
 }

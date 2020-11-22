@@ -9,7 +9,7 @@
     <header>
         Sign up as a sender
     </header>
-    <form action="https://infinite-hamlet-29399.herokuapp.com/sender/register" method="POST" id="signup-form" enctype="multipart/form-data">
+    <form action="/sender/sign-up" method="POST" id="signup-form" enctype="multipart/form-data">
         <ul>
             <li>
                 <input type="text" id="firstname" name="firstname" placeholder="First Name">
@@ -18,6 +18,10 @@
             <li>
                 <input type="text" id="lastname" name="lastname" placeholder="Last Name">
                 <p id="lastname-message"></p>
+            </li>
+            <li>
+                <input type="email" id="email" name="email" placeholder="email">
+                <p id="email-message"></p>
             </li>
             <li>
                 <input type="text" id="login" name="login" placeholder="Login">
@@ -31,16 +35,9 @@
                 <input type="password" id="repassword" name="repassword" placeholder="Confirm Password">
                 <p id="repassword-message"></p>
             </li>
-            <li><label for="Gender">Gender:</label>
-            <input type="radio" id="gender-male" name="sex" value="M" checked><label for="male">Male</label>
-            <input type="radio" id="gender-female"name="sex" value="F"><label for="female">Female</label></li>
-            <span id="gender-message"></span>
             <li>
-                <div class="upload-btn-wrapper">
-                    <button class="btn">Upload photo</button>
-                    <input type="file" name="photo" id="photo">
-                  </div>
-                <p id="photo-message">Nie wybrano pliku</p>
+                <input type="text" id="address" name="address" placeholder="address">
+                <p id="address-message"></p>
             </li>
             <li>
                 <input id="submit-form"type="submit" value="Sign Up">
