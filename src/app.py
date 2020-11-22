@@ -23,11 +23,11 @@ ses = Session(app)
 def index():
     return render_template('index.html')
 
-@app.route('/sender/sign-up/', methods=['GET'])
+@app.route('/sender/sign-up', methods=['GET'])
 def sender_signup_get():
     return render_template('sender-signup.html')
 
-@app.route('/sender/sign-up/', methods=['POST'])
+@app.route('/sender/sign-up', methods=['POST'])
 def sender_signup_post():
     user = {}
     user["firstname"] = request.form.get('firstname')
@@ -41,9 +41,20 @@ def sender_signup_post():
     if validate_signup_form(user):
         return register_user(user)
     else:
-        return("invalid")
-        #redirect(url_for('index'))
+        return redirect(url_for('sender_signup_get'))
 
+
+@app.route('/sender/login', methods=['GET'])
+def sender_login_get():
+    return render_template('sender-login.html')
+
+@app.route('/checkuser/<login>')
+def check_user(login):
+    if not is_user(login):
+        return make_response('available', 200)
+    else:
+        return make_response('taken', 200)
+        
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/img'), 'inPoster.png')
@@ -74,6 +85,9 @@ def validate_signup_form(user):
     elif not re.compile('[a-z]{3,12}').match(user["login"]):
         valid = False
         flash("Invalid lastname provided")
+    elif is_user(user["login"]):
+        valid = False
+        flash("User already exists")
 
     if not user["email"]:
         valid = False
@@ -100,9 +114,11 @@ def validate_signup_form(user):
         valid = False
         flash("No address provided")
     #regex should be added later
-    #check if exists in database should be added later
 
     return valid
+
+def is_user(login):
+    return db.hexists(f"user:{login}", "password")
 
 def redirect(url, status=301):
     response = make_response('', status)
@@ -111,7 +127,7 @@ def redirect(url, status=301):
 
 def register_user(user):
     db.hset(f"user:{user['login']}", "password", user["password"])
-    return "REGISTERED"
+    return redirect(url_for('sender_login_get'))
 
 if __name__ == '__main__':
     app.run(debug=False)

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block head %}
+<title>Register a sender</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/sender-login.css') }}">
+{% endblock %}
+{% block body %}
+login page will be here
+
+<form action="">
+    <ul>
+        <li>
+            <input type="text" name="login" id="login" placeholder="login">
+        </li>
+        <li>
+            <input type="password" name="password" id="password" placeholder="password">
+        </li>
+    </ul>
+</form>
+
+
+{% endblock %}

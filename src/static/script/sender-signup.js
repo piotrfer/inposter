@@ -37,11 +37,11 @@ onLoginInput = function () {
         }
         else {
             var xhr = new XMLHttpRequest()
-            xhr.open("GET", "https://infinite-hamlet-29399.herokuapp.com/check/" + loginForm.value)
+            xhr.open("GET", "/checkuser/" + loginForm.value)
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == 4) {
                     if (xhr.status == 200) {
-                        if (JSON.parse(xhr.response)[loginForm.value] == "available") {
+                        if (xhr.response == "available") {
                             loginValidMessage.innerText = "Login is available"
                             loginValidMessage.className = "ok-message"
                             valid["login"] = true
