@@ -1,31 +1,34 @@
-from flask import Flask, render_template, request, flash, make_response, url_for
+from dotenv import load_dotenv
+from os import getenv
+from flask import Flask, render_template, request, flash, make_response, url_for, session
 from flask_session import Session
 import os
 from flask import send_from_directory
 import re
 from bcrypt import gensalt, hashpw, checkpw
+from datetime import datetime
 
 from redis import Redis
-db = Redis(host='redis', port=6379, db=0) 
-
-from os import getenv
-from dotenv import load_dotenv
+db = Redis(host='redis', port=6379, db=0)
 
 load_dotenv()
-SESSION_TYPE='redis'
-SESSION_REDIS=db
+SESSION_TYPE = 'redis'
+SESSION_REDIS = db
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = getenv('SECRET_KEY')
 ses = Session(app)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 @app.route('/sender/sign-up', methods=['GET'])
 def sender_signup_get():
     return render_template('sender-signup.html')
+
 
 @app.route('/sender/sign-up', methods=['POST'])
 def sender_signup_post():
@@ -48,6 +51,7 @@ def sender_signup_post():
 def sender_login_get():
     return render_template('sender-login.html')
 
+
 @app.route('/sender/login', methods=['POST'])
 def sender_login_post():
     login = request.form.get('login')
@@ -61,7 +65,18 @@ def sender_login_post():
         return redirect(url_for('sender_login_get'))
 
     flash(f"Welcome {login}")
+    session['login'] = login
+    session['timestamp'] = datetime.now()
     return redirect(url_for('index'))
+
+@app.route('/sender/logout')
+def sender_logout():
+    session.clear()
+    flash("You were logged out")
+    response = make_response("", 301)
+    response.headers["Location"] = "/"
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return response
 
 @app.route('/checkuser/<login>')
 def check_user(login):
@@ -69,7 +84,8 @@ def check_user(login):
         return make_response('available', 200)
     else:
         return make_response('taken', 200)
-        
+
+
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/img'), 'inPoster.png')
@@ -128,9 +144,10 @@ def validate_signup_form(user):
     if not user["address"]:
         valid = False
         flash("No address provided")
-    #regex should be added later
+    # regex should be added later
 
     return valid
+
 
 def verify_user(login, given_password):
     given_password = given_password.encode('utf-8')
@@ -144,21 +161,24 @@ def verify_user(login, given_password):
 def is_user(login):
     return db.hexists(f"user:{login}", "password")
 
+
 def redirect(url, status=301):
     response = make_response('', status)
     response.headers['Location'] = url
-    return response 
+    return response
+
 
 def register_user(user):
-    db.hset(f"user:{user['firstname']}", "firstname", user["firstname"])
-    db.hset(f"user:{user['lastname']}", "lastname", user["lastname"])
-    db.hset(f"user:{user['address']}", "address", user["address"])
-    db.hset(f"user:{user['email']}", "email", user["email"])
-    
+    db.hset(f"user:{user['login']}", "firstname", user["firstname"])
+    db.hset(f"user:{user['login']}", "lastname", user["lastname"])
+    db.hset(f"user:{user['login']}", "address", user["address"])
+    db.hset(f"user:{user['login']}", "email", user["email"])
+
     hashed = hashpw(user["password"].encode('utf-8'), gensalt(5))
     db.hset(f"user:{user['login']}", "password", hashed)
 
     return redirect(url_for('sender_login_get'))
+
 
 if __name__ == '__main__':
     app.run(debug=False)
