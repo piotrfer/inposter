@@ -48,6 +48,21 @@ def sender_signup_post():
 def sender_login_get():
     return render_template('sender-login.html')
 
+@app.route('/sender/login', methods=['POST'])
+def sender_login_post():
+    login = request.form.get('login')
+    password = request.form.get('password')
+
+    if not login or not password:
+        flash("no login or password")
+        return redirect(url_for('sender_login_get'))
+    if not verify_user(login, password):
+        flash("invalid login and/or password")
+        return redirect(url_for('sender_login_get'))
+
+    flash(f"Welcome {login}")
+    return redirect(url_for('index'))
+
 @app.route('/checkuser/<login>')
 def check_user(login):
     if not is_user(login):
@@ -116,6 +131,15 @@ def validate_signup_form(user):
     #regex should be added later
 
     return valid
+
+def verify_user(login, given_password):
+    given_password = given_password.encode()
+    real_password = db.hget(f"user:{login}", "password")
+    if not real_password:
+        print(f"ERROR: not password for user {login}")
+        return False
+    return real_password == given_password
+
 
 def is_user(login):
     return db.hexists(f"user:{login}", "password")

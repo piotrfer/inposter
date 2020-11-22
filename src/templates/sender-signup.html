@@ -9,6 +9,15 @@
     <header>
         Sign up as a sender
     </header>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
     <form action="/sender/sign-up" method="POST" id="signup-form" enctype="multipart/form-data">
         <ul>
             <li>
