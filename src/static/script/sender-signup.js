@@ -4,7 +4,6 @@ window.onload = function () {
     document.getElementById("lastname").addEventListener("change", onLastnameChange)
     document.getElementById("password").addEventListener("change", onPasswordChange)
     document.getElementById("repassword").addEventListener("change", onRepasswordChange)
-    document.getElementById("photo").addEventListener("change", onPhotoChange)
     document.getElementById("signup-form").addEventListener("submit", onFormSubmit)
 }
 
@@ -13,8 +12,7 @@ var valid = {
     "lastname": false,
     "login": false,
     "password": false,
-    "repassword": false,
-    "photo": false
+    "repassword": false
 }
 
 onLoginInput = function () {
@@ -141,30 +139,9 @@ onRepasswordChange = function () {
 
 }
 
-onPhotoChange = function () {
-    var photoForm = document.getElementById("photo")
-    var photoMessage = document.getElementById("photo-message")
-
-    photoMessage.innerText = ""
-    valid["photo"] = false
-
-    if (!/(\.png|\.jpg|\.jpeg)$/i.test(photoForm.value) || photoForm.value == "") {
-        photoMessage.innerText = "You can only submit .png, .jpg and .jpeg files"  
-        photoMessage.className = "error-message"
-    }
-    else {
-        photoMessage.innerText = photoForm.value
-        photoMessage.className = "ok-message"
-         valid["photo"] = true
-    }
-}
-
 onFormSubmit = function (e) {
     var formValid = false;
-    formValid = valid["firstname"] && valid["lastname"] && valid["login"] && valid["password"] && valid["repassword"] && valid["photo"]
-    
-    //only for development
-    formValid = true
+    formValid = valid["firstname"] && valid["lastname"] && valid["login"] && valid["password"] && valid["repassword"]
 
     if (!formValid)
         e.preventDefault()

@@ -12,9 +12,21 @@
     <nav>
         <ul class="menu">
             <li class="item"><a href="/">Home</a></li>
-            <li class="item"><a href="/sender/sign-up">Sender - Register</a></li>
-            <li class="item"><a href="/sender/login">Sender - Login</a></li>
-            <li class="item"><a href="/sender/logout">Sender - Logout</a></li>
+            <li class="item"><a href="/dashboard">Dashboard</a></li>    
+            {% if session["login"] %}
+            <li class="item">
+                
+                <a href="/sender/logout">Logout</a>
+                <li id="name">Logged as {{session["login"]}}</li>
+            </li>
+            {% else %}
+            <li class="item">
+                <a href="/sender/sign-up">Register</a>
+            </li>
+            <li class="item">
+                <a href="/sender/login">Login</a>
+            </li>
+            {% endif %}
         </ul>
     </nav>
     {% block body %}{% endblock %}

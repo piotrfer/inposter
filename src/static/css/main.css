@@ -72,3 +72,9 @@ footer img {
     width: 60%;
     margin: auto;
 }
+
+#name {
+    font-size: smaller;
+    font-weight: lighter;
+    font-style: italic;
+}
