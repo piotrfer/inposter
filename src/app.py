@@ -73,10 +73,16 @@ def sender_login_post():
 def sender_logout():
     session.clear()
     flash("You were logged out")
-    response = make_response("", 301)
-    response.headers["Location"] = "/"
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    return response
+    return redirect(url_for('index'))
+
+
+@app.route('/dashboard')
+def dashboard_get():
+    if not session.get('login'):
+        flash("You have to be logged in to view dashboard")
+        return redirect(url_for('sender_login_get'))
+    
+    return render_template('dashboard.html')
 
 @app.route('/checkuser/<login>')
 def check_user(login):
@@ -165,6 +171,7 @@ def is_user(login):
 def redirect(url, status=301):
     response = make_response('', status)
     response.headers['Location'] = url
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     return response
 
 

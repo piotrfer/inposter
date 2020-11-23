@@ -9,15 +9,6 @@
     <header>
         Sign up as a sender
     </header>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul class=flashes>
-        {% for message in messages %}
-        <li>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    {% endwith %}
     <form action="/sender/sign-up" method="POST" id="signup-form" enctype="multipart/form-data">
         <ul>
             <li>
@@ -48,6 +39,7 @@
                 <input type="text" id="address" name="address" placeholder="address">
                 <p id="address-message"></p>
             </li>
+            <p>You already have an account? <button><a href="{{ url_for('sender_login_get')}}">Log in</a></button></p>
             <li>
                 <input id="submit-form" type="submit" value="Sign Up">
                 <span id="submit-message"></span>

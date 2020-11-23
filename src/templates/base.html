@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,16 +9,17 @@
     {% block head %}{% endblock %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 </head>
+
 <body>
     <nav>
         <ul class="menu">
             <li class="item"><a href="/">Home</a></li>
-            <li class="item"><a href="/dashboard">Dashboard</a></li>    
+            <li class="item"><a href="/dashboard">Dashboard</a></li>
             {% if session["login"] %}
             <li class="item">
-                
+
                 <a href="/sender/logout">Logout</a>
-                <li id="name">Logged as {{session["login"]}}</li>
+            <li id="name">Logged as {{session["login"]}}</li>
             </li>
             {% else %}
             <li class="item">
@@ -29,13 +31,25 @@
             {% endif %}
         </ul>
     </nav>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class=flashes>
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+    {% endwith %}
     {% block body %}{% endblock %}
-<footer>
-    <ul>
-        <li>2020</li>
-        <li>Piotr Ferdynus</li>
-        <li><a href="https://github.com/piotrfer/inposter">GitHub</a></li>
-    </ul>
-</footer>
+    <footer>
+        <ul>
+            <li>2020</li>
+            <li>Piotr Ferdynus</li>
+            <li><a href="https://github.com/piotrfer/inposter">GitHub</a></li>
+        </ul>
+    </footer>
 </body>
+
 </html>
