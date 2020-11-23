@@ -1,0 +1,27 @@
+{% extends 'dashboard.html' %}
+{% block dash_content %}
+
+<form action="{{ url_for('dashboard_post')}}" method="POST" enctype="multipart/form-data">
+    <ul>
+        <li>
+            <input type="text" name="recipient-name" placeholder="recipient name">
+        </li>
+        <li>
+            <input type="text" name="recipient-address" placeholder="recipient address">
+        </li>
+        <li>
+            <input type="text" name="box-id" placeholder="box id">
+        </li>
+        <li>
+            <input type="text" name="dimensions" placeholder="dimensions">
+        </li>
+        <li>
+            <input type="submit" value="Save">
+            <button><a href="{{ url_for('dashboard_get')}}">Cancel</a></button>
+        </li>
+    </ul>
+</form>
+
+
+
+{% endblock %}

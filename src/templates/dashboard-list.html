@@ -1,0 +1,15 @@
+{% extends 'dashboard.html' %}
+
+{% block dash_content %}
+
+<h1>My labels:</h1> <button><a href="/dashboard/create">+</a></button>
+<ul class="label-list">
+    {% for label in labels %}
+    <li>
+        {{ label }}
+    </li>
+    {% endfor %}
+</ul>
+
+
+{% endblock%}

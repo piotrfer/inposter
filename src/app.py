@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, flash, make_response, url_for
 from flask_session import Session
 import os
 from flask import send_from_directory
-import re
+import re, uuid
 from bcrypt import gensalt, hashpw, checkpw
 from datetime import datetime
 
@@ -76,13 +76,37 @@ def sender_logout():
     return redirect(url_for('index'))
 
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET'])
 def dashboard_get():
     if not session.get('login'):
         flash("You have to be logged in to view dashboard")
         return redirect(url_for('sender_login_get'))
     
-    return render_template('dashboard.html')
+    return render_template('dashboard-list.html', labels=get_user_labels(session.get('login')))
+
+
+@app.route('/dashboard', methods=['POST'])
+def dashboard_post():
+    if not session.get('login'):
+        flash("You have to be logged in to view dashboard")
+        return redirect(url_for('sender_login_get'))
+    label = {}
+    label["name"] = request.form.get("recipient-name")
+    label["address"] = request.form.get("recipient-address")
+    label["box"] = request.form.get("box-id")
+    label["dimensions"] = request.form.get("dimensions")
+
+    if not verify_label(label):
+        return redirect(url_for('dashboard_post'))
+    
+    label["id"] = uuid.uuid4()
+    return register_label(label, session.get('login'))
+
+
+@app.route('/dashboard/create')
+def create_label():
+    return render_template('dashboard-create.html')
+
 
 @app.route('/checkuser/<login>')
 def check_user(login):
@@ -96,6 +120,46 @@ def check_user(login):
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/img'), 'inPoster.png')
 
+
+def get_user_labels(user):
+    labels = []
+    for key in db.scan_iter("label:*"):
+        key = key.decode()
+        if db.hget(key, "user").decode() == user:
+            label = {
+                "id" : key.split(':')[1],
+                "name" : db.hget(key, "name").decode(),
+                "address" : db.hget(key, "address").decode(),
+                "box" : db.hget(key, "box").decode(),
+                "dimensions" : db.hget(key, "dimensions").decode()
+            }
+            labels.append(label)
+    return labels
+
+def verify_label(label):
+    valid = True
+    if not label.get("name"):
+        valid = False
+        flash("No recipient name provided")
+    if not label.get("address"):
+        valid = False
+        flash("No recipient address provided")
+    if not label.get("box"):
+        valid = False
+        flash("No mailbox id provided")
+    if not label.get("dimensions"):
+        valid = False
+        flash("No dimensions provided")
+    return valid
+
+def register_label(label, user):
+    db.hset(f"label:{label['id']}", "user", user)
+    db.hset(f"label:{label['id']}", "name", label.get('name'))
+    db.hset(f"label:{label['id']}", "address", label.get('address'))
+    db.hset(f"label:{label['id']}", "box", label.get('box'))
+    db.hset(f"label:{label['id']}", "dimensions", label.get('dimensions'))
+    flash("Label added successfuly")
+    return redirect(url_for('dashboard_get'))
 
 def validate_signup_form(user):
     PL = 'ĄĆĘŁŃÓŚŹŻ'
