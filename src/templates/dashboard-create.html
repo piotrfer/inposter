@@ -1,4 +1,7 @@
 {% extends 'dashboard.html' %}
+{% block dash_head %} 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dash-create.css')}}">
+{% endblock %}
 {% block dash_content %}
 
 <form action="{{ url_for('dashboard_post')}}" method="POST" enctype="multipart/form-data">

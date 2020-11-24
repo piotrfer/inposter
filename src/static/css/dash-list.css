@@ -1,0 +1,18 @@
+.label-list {
+    width: 100%;
+    justify-content: space-evenly;
+    align-items: center;
+    display: flex;
+}
+
+.label-list ul li {
+    width:100%;
+    box-sizing: border-box;
+    padding: 20px;
+    background-color: #fcf4d9;
+    list-style: none;
+    border: 1px solid #fcf4d9;
+    border-radius: 15px;
+    display: inline-block;
+    margin: 10px;
+}

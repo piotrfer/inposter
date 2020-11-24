@@ -2,9 +2,8 @@ from dotenv import load_dotenv
 from os import getenv
 from flask import Flask, render_template, request, flash, make_response, url_for, session
 from flask_session import Session
-import os
 from flask import send_from_directory
-import re, uuid
+import os, re, uuid, sys
 from bcrypt import gensalt, hashpw, checkpw
 from datetime import datetime
 
@@ -18,6 +17,12 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = getenv('SECRET_KEY')
 ses = Session(app)
+
+try:
+    db.info()
+except ConnectionError:
+    print("Couldn't connect to database. Process will terminate.")
+    sys.exit(-1)
 
 
 @app.route('/')
@@ -106,6 +111,24 @@ def dashboard_post():
 @app.route('/dashboard/create')
 def create_label():
     return render_template('dashboard-create.html')
+
+@app.route('/label/<id>', methods=['DELETE'])
+def delete_label(id):
+    if not session.get('login'):
+        flash("You have to be logged in to delete label")
+        return make_response('', 401)
+    
+    if not db.hexists(f"label:{id}", "user"):
+        flash("There is no label with this id")
+        return make_response('',404)
+    
+    if db.hget(f"label:{id}", "user").decode() != session.get('login'):
+        flash("You are not authorized to delete this label")
+        return make_response('', 401)
+    
+    db.delete(f"label:{id}")
+    flash("Label was deleted succesfully")
+    return make_response('', 204)
 
 
 @app.route('/checkuser/<login>')

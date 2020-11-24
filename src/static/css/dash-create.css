@@ -1,0 +1,39 @@
+html, body {
+    overflow: auto;
+}
+
+
+form ul li{
+    list-style-type: none;
+}
+
+ul {
+    margin: 0;
+}
+
+form {
+    margin-top: 1%;
+    text-align: center;
+}
+
+form ul {
+    margin: 5px 5px;
+}
+
+textarea:focus, input:focus{
+    outline: none;
+}
+
+input {
+    box-sizing: border-box;
+    padding: 20px 20px;
+    margin: 12px 15px;
+    border-radius: 15px;
+    border: 1px solid grey;
+}
+
+input:hover {
+    border-color: #272C28;
+    box-shadow: 5px;
+    color: #272C28;
+}

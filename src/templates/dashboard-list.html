@@ -1,15 +1,28 @@
 {% extends 'dashboard.html' %}
 
+{% block dash_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dash-list.css')}}">
+<script src="{{ url_for('static', filename='script/label-delete.js') }}"></script>
+{% endblock %}
+
 {% block dash_content %}
 
 <h1>My labels:</h1> <button><a href="/dashboard/create">+</a></button>
-<ul class="label-list">
-    {% for label in labels %}
-    <li>
-        {{ label }}
-    </li>
-    {% endfor %}
-</ul>
+<div class="label-list">
+    <ul>
+        {% for label in labels %}
+        <li>
+            <p class="label-id">{{ label["id"] }}</p>
+            <p class="label-recepient">TO: {{ label["name"] }} ADDRESS: {{ label["address"] }}</p>
+            <p class="label-data">BOX-ID: {{ label["box"] }} DIMENSIONS: {{ label["dimensions"] }}</p>
+            <form class="delete-btn" id="{{ label['id']}}">
+                <input type="submit" value="Delete">
+            </form>
+
+        </li>
+        {% endfor %}
+    </ul>
+</div>
 
 
 {% endblock%}
