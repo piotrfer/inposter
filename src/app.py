@@ -1,8 +1,6 @@
 from dotenv import load_dotenv
 from os import getenv
 from flask import Flask, render_template, request, flash, make_response, url_for, session, send_from_directory
-
-from flask import 
 import os
 import json, requests
 
