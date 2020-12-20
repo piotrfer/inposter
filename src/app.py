@@ -1,15 +1,10 @@
 from dotenv import load_dotenv
 from os import getenv
-from flask import Flask, render_template, request, flash, make_response, url_for, session
+from flask import Flask, render_template, request, flash, make_response, url_for, session, send_from_directory
 
-from flask import send_from_directory
-import os, re, uuid, sys
-from bcrypt import gensalt, hashpw, checkpw
-from datetime import datetime
-
+from flask import 
+import os
 import json, requests
-from urllib.parse import quote_plus
-from flask import jsonify, session
 
 load_dotenv()
 SERVER_URL = getenv('SERVER_URL')
