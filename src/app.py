@@ -1,78 +1,102 @@
 from dotenv import load_dotenv
 from os import getenv
 from flask import Flask, render_template, request, flash, make_response, url_for, session
-from flask_session import Session
+
 from flask import send_from_directory
 import os, re, uuid, sys
 from bcrypt import gensalt, hashpw, checkpw
 from datetime import datetime
 
-from redis import Redis
-db = Redis(host='redis', port=6379, db=0)
+import json, requests
+from urllib.parse import quote_plus
+from flask import jsonify, session
 
 load_dotenv()
-SESSION_TYPE = 'redis'
-SESSION_REDIS = db
+SERVER_URL = getenv('SERVER_URL')
+
 app = Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = getenv('SECRET_KEY')
-ses = Session(app)
 
-try:
-    db.info()
-except ConnectionError:
-    print("Couldn't connect to database. Process will terminate.")
-    sys.exit(-1)
+service = {}
+user_token = ''
 
+@app.before_first_request
+def map_service():
+    data = json.loads(requests.get('https://inposter-service.herokuapp.com/').text)['_links']
+    service['sender'] = data['sender']['href']
+    service['labels'] = data['labels']['href']
+    service['parcels'] = data['parcels']['href']
+    data = json.loads(requests.get(SERVER_URL+service['sender']).text)['_links']
+    service['sender-signup'] = data['signup']['href']
+    service['sender-login'] = data['login']['href']
+    data = json.loads(requests.get(SERVER_URL+service['labels']).text)['_links']
+    service['labels-list'] = data['list']['href']
+    data = json.loads(requests.get(SERVER_URL+service['parcels']).text)['_links']
+    service['parcels-list'] = data['list']['href']
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/sender/sign-up', methods=['GET', 'POST'])
+def sender_signup():
+    if request.method == 'GET':
+        return render_template('sender-signup.html')
+    if request.method == 'POST':
+        signup_url = SERVER_URL + service['sender-signup']
+        r = requests.post(signup_url, json=request.form)
+        if r.status_code != 201:
+            if r.text != '' and r.status_code != 500:
+                error = json.loads(r.text)['error']
+                flash(error)
+            return redirect(url_for('sender_signup'))
+        else:
+            flash("You were registered successfuly")
+            return redirect(url_for('sender_login'))
 
-@app.route('/sender/sign-up', methods=['GET'])
-def sender_signup_get():
-    return render_template('sender-signup.html')
+@app.route('/sender/login', methods=['GET', 'POST'])
+def sender_login():
+    if request.method == 'GET':
+        return render_template('sender-login.html')
+    if request.method == 'POST':
+        login_url = SERVER_URL + service['sender-login']
+        r = requests.post(login_url, json=request.form)
+        if r.status_code != 200:
+            if r.text != '' and r.status_code != 500:
+                error = json.loads(r.text)['error']
+                flash(error)
+            return redirect(url_for('sender_login'))
+        else:
+            token = 'Bearer ' + json.loads(r.text)['token']
+            session["token"] = token
+            session["login"] = request.form.get("login")
+            flash("You were logged in succesfuly")
+            return redirect(url_for('index'))
 
-
-@app.route('/sender/sign-up', methods=['POST'])
-def sender_signup_post():
-    user = {}
-    user["firstname"] = request.form.get('firstname')
-    user["lastname"] = request.form.get('lastname')
-    user["login"] = request.form.get('login')
-    user["email"] = request.form.get('email')
-    user["password"] = request.form.get('password')
-    user["repassword"] = request.form.get('repassword')
-    user["address"] = request.form.get('address')
-
-    if validate_signup_form(user):
-        return register_user(user)
+@app.route('/dashboard')
+def dashboard_page():
+    if "token" not in session:
+        flash("You have to be logged in to view this page")
+        return redirect(url_for('sender_login'))
+    rl = requests.get(SERVER_URL + service['labels-list'], headers={'Authorization' : session["token"]})
+    rp = requests.get(SERVER_URL + service['parcels-list'], headers={'Authorization' : session["token"]})
+    labels = []
+    parcels = []
+    if rl.status_code == 200:
+         labels = json.loads(rl.text)['_embedded']['items']
+    if rp.status_code == 200: 
+        parcels = json.loads(rp.text)['_embedded']['items']
     else:
-        return redirect(url_for('sender_signup_get'))
-
-
-@app.route('/sender/login', methods=['GET'])
-def sender_login_get():
-    return render_template('sender-login.html')
-
-
-@app.route('/sender/login', methods=['POST'])
-def sender_login_post():
-    login = request.form.get('login')
-    password = request.form.get('password')
-
-    if not login or not password:
-        flash("no login or password")
-        return redirect(url_for('sender_login_get'))
-    if not verify_user(login, password):
-        flash("invalid login and/or password")
-        return redirect(url_for('sender_login_get'))
-
-    flash(f"Welcome {login}")
-    session['login'] = login
-    session['timestamp'] = datetime.now()
-    return redirect(url_for('index'))
+        if rl.status_code != 500:
+            if rl.text != '' :
+                    flash(rl.text)
+            return redirect(url_for('index'))
+        if rp.status_code != 500:
+            if rp.text != '' :
+                    flash(rp.text)
+            return redirect(url_for('index'))
+    return render_template('dashboard-list.html', labels=labels, parcels=parcels)
 
 @app.route('/sender/logout')
 def sender_logout():
@@ -80,180 +104,62 @@ def sender_logout():
     flash("You were logged out")
     return redirect(url_for('index'))
 
+@app.route('/labels', methods=['GET', 'POST'])
+def label_detail():
+    action = request.args.get('a')
+    id = request.args.get('id')
+    if request.method == 'GET':
+        if action == 'details':
+            r = requests.get(SERVER_URL+f'/labels/{id}', headers={'Authorization' : session["token"]})
+            if r.status_code == 200:
+                label = json.loads(r.text)
+                return render_template('dashboard-detail.html', label=label)
+            else:
+                flash(r.text)
+                return redirect(url_for('dashboard_page'))
+        if action == 'edit':
+            r = requests.get(SERVER_URL+f'/labels/{id}', headers={'Authorization' : session["token"]})
+            if r.status_code == 200:
+                label = json.loads(r.text)
+                return render_template('dashboard-edit.html', label=label)
+            else:
+                flash(r.text)
+                return redirect(url_for('dashboard_page'))
+        if action == 'delete':
+            r = requests.delete(SERVER_URL+f'/labels/{id}',  headers={'Authorization' : session["token"]})
+            if r.status_code == 204:
+                flash('Label deleted successfuly')
+                return redirect(url_for('dashboard_page'))
+            else:
+                flash(r.text)
+                return redirect(url_for('dashboard_page'))
+        if action == 'cancel':
+            return redirect(url_for('dashboard_page'))
+    if request.method == 'POST':
+        r = requests.patch(SERVER_URL+f'/labels/{id}', json=request.form, headers={'Authorization' : session["token"]})
+        if r.status_code == 200:
+            flash("Label updated successfuly")
+        else:
+            flash(r.text)
+        return redirect(f'/labels?a=details&id={id}')
 
-@app.route('/dashboard', methods=['GET'])
-def dashboard_get():
-    if not session.get('login'):
-        flash("You have to be logged in to view dashboard")
-        return redirect(url_for('sender_login_get'))
-    
-    return render_template('dashboard-list.html', labels=get_user_labels(session.get('login')))
+@app.route('/labels/new', methods=['GET', 'POST'])
+def label_new():
+    if request.method == 'GET':
+        return render_template('dashboard-create.html')
 
-
-@app.route('/dashboard', methods=['POST'])
-def dashboard_post():
-    if not session.get('login'):
-        flash("You have to be logged in to view dashboard")
-        return redirect(url_for('sender_login_get'))
-    label = {}
-    label["name"] = request.form.get("recipient-name")
-    label["address"] = request.form.get("recipient-address")
-    label["box"] = request.form.get("box-id")
-    label["dimensions"] = request.form.get("dimensions")
-
-    if not verify_label(label):
-        return redirect(url_for('dashboard_post'))
-    
-    label["id"] = uuid.uuid4()
-    return register_label(label, session.get('login'))
-
-
-@app.route('/dashboard/create')
-def create_label():
-    return render_template('dashboard-create.html')
-
-@app.route('/label/<id>', methods=['DELETE'])
-def delete_label(id):
-    if not session.get('login'):
-        flash("You have to be logged in to delete label")
-        return make_response('', 401)
-    
-    if not db.hexists(f"label:{id}", "user"):
-        flash("There is no label with this id")
-        return make_response('',404)
-    
-    if db.hget(f"label:{id}", "user").decode() != session.get('login'):
-        flash("You are not authorized to delete this label")
-        return make_response('', 401)
-    
-    db.delete(f"label:{id}")
-    flash("Label was deleted succesfully")
-    return make_response('', 204)
-
-
-@app.route('/checkuser/<login>')
-def check_user(login):
-    if not is_user(login):
-        return make_response('available', 200)
-    else:
-        return make_response('taken', 200)
-
+    if request.method == 'POST':
+        r = requests.post(SERVER_URL+service['labels-list'],json=request.form, headers={'Authorization' : session["token"]})
+        if r.status_code == 201:
+            flash("Label created successfuly")
+            return redirect(url_for('dashboard_page'))
+        else:
+            flash(r.text)
+            return redirect(url_for('dashboard_page'))
 
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static/img'), 'inPoster.png')
-
-
-def get_user_labels(user):
-    labels = []
-    for key in db.scan_iter("label:*"):
-        key = key.decode()
-        if db.hget(key, "user").decode() == user:
-            label = {
-                "id" : key.split(':')[1],
-                "name" : db.hget(key, "name").decode(),
-                "address" : db.hget(key, "address").decode(),
-                "box" : db.hget(key, "box").decode(),
-                "dimensions" : db.hget(key, "dimensions").decode()
-            }
-            labels.append(label)
-    return labels
-
-def verify_label(label):
-    valid = True
-    if not label.get("name"):
-        valid = False
-        flash("No recipient name provided")
-    if not label.get("address"):
-        valid = False
-        flash("No recipient address provided")
-    if not label.get("box"):
-        valid = False
-        flash("No mailbox id provided")
-    if not label.get("dimensions"):
-        valid = False
-        flash("No dimensions provided")
-    return valid
-
-def register_label(label, user):
-    db.hset(f"label:{label['id']}", "user", user)
-    db.hset(f"label:{label['id']}", "name", label.get('name'))
-    db.hset(f"label:{label['id']}", "address", label.get('address'))
-    db.hset(f"label:{label['id']}", "box", label.get('box'))
-    db.hset(f"label:{label['id']}", "dimensions", label.get('dimensions'))
-    flash("Label added successfuly")
-    return redirect(url_for('dashboard_get'))
-
-def validate_signup_form(user):
-    PL = 'ĄĆĘŁŃÓŚŹŻ'
-    pl = 'ąćęłńóśźż'
-
-    valid = True
-    if not user["firstname"]:
-        valid = False
-        flash("No firstname provided")
-    elif not re.compile(f'[A-Z{PL}][a-z{pl}]+').match(user["firstname"]):
-        valid = False
-        flash("Invalid firstname provided")
-
-    if not user["lastname"]:
-        valid = False
-        flash("No lastname provided")
-    elif not re.compile(f'[A-Z{PL}][a-z{pl}]+').match(user["lastname"]):
-        valid = False
-        flash("Invalid lastname provided")
-
-    if not user["login"]:
-        valid = False
-        flash("No login provided")
-    elif not re.compile('[a-z]{3,12}').match(user["login"]):
-        valid = False
-        flash("Invalid lastname provided")
-    elif is_user(user["login"]):
-        valid = False
-        flash("User already exists")
-
-    if not user["email"]:
-        valid = False
-        flash("No email provided")
-    elif not re.compile('^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$').match(user["email"]):
-        valid = False
-        flash("Invalid email provided")
-
-    if not user["password"]:
-        valid = False
-        flash("No password provided")
-    elif not re.compile('.{8,}').match(user["password"].strip()):
-        valid = False
-        flash("Invalid password provided")
-
-    if not user["repassword"]:
-        valid = False
-        flash("No repassword provided")
-    elif not user["password"] == user["repassword"]:
-        valid = False
-        flash("Invalid repassword provided")
-
-    if not user["address"]:
-        valid = False
-        flash("No address provided")
-    # regex should be added later
-
-    return valid
-
-
-def verify_user(login, given_password):
-    given_password = given_password.encode('utf-8')
-    real_password = db.hget(f"user:{login}", "password")
-    if not real_password:
-        print(f"ERROR: not password for user {login}")
-        return False
-    return checkpw(given_password, real_password)
-
-
-def is_user(login):
-    return db.hexists(f"user:{login}", "password")
-
 
 def redirect(url, status=301):
     response = make_response('', status)
@@ -262,18 +168,8 @@ def redirect(url, status=301):
     return response
 
 
-def register_user(user):
-    db.hset(f"user:{user['login']}", "firstname", user["firstname"])
-    db.hset(f"user:{user['login']}", "lastname", user["lastname"])
-    db.hset(f"user:{user['login']}", "address", user["address"])
-    db.hset(f"user:{user['login']}", "email", user["email"])
-
-    hashed = hashpw(user["password"].encode('utf-8'), gensalt(5))
-    db.hset(f"user:{user['login']}", "password", hashed)
-
-    return redirect(url_for('sender_login_get'))
-
+def is_logged_in():
+    return "token" in session
 
 if __name__ == '__main__':
-    app.run(debug=False)
-    #app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)

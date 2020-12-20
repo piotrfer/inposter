@@ -2,12 +2,11 @@
 
 {% block dash_head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dash-list.css')}}">
-<script src="{{ url_for('static', filename='script/label-delete.js') }}"></script>
 {% endblock %}
 
 {% block dash_content %}
 
-<h1>My labels:</h1> <button><a href="/dashboard/create">+</a></button>
+<h1>My labels:</h1> <button><a href="/labels/new">+</a></button>
 <div class="label-list">
     <ul>
         {% for label in labels %}
@@ -15,10 +14,20 @@
             <p class="label-id">{{ label["id"] }}</p>
             <p class="label-recepient">TO: {{ label["name"] }} ADDRESS: {{ label["address"] }}</p>
             <p class="label-data">BOX-ID: {{ label["box"] }} DIMENSIONS: {{ label["dimensions"] }}</p>
-            <form class="delete-btn" id="{{ label['id']}}">
-                <input type="submit" value="Delete">
-            </form>
-
+            <button><a href="/labels?a=details&id={{ label['id'] }}">Details</a></button>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+<h1>My parcels:</h1>
+<div class="label-list">
+    <ul>
+        {% for parcel in parcels %}
+        <li>
+            <p class="parcel-id">{{ parcel["id"] }}</p>
+            <p class="parcel-label">LABEL: {{ parcel["label"] }}</p>
+            <p class="parcel-label">COURIER: {{ parcel["courier"] }}</p>
+            <p class="parcel-label">STATUS: {{ parcel["status"] }}</p>
         </li>
         {% endfor %}
     </ul>

@@ -1,0 +1,44 @@
+{% extends 'dashboard.html' %}
+
+{% block dash_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dash-detail.css')}}">
+{% endblock %}
+
+{% block dash_content %}
+<h2>Label <i>{{ label['id'] }}</i> </h2>
+<ul>
+    <li>
+        to: {{ label['name'] }}
+    </li>
+    <li>
+        address: {{ label['address'] }}
+    </li>
+    <li>
+        box: {{ label['box'] }}
+    </li>
+    <li>
+        dimensions: {{ label['dimensions'] }}
+    </li>
+    <li>
+        sent: {{ label['sent'] }}
+    </li>
+    <li>
+    {% if "label:patch" in label["_links"] %}
+        <button>
+            <a href="labels?a=edit&id={{label['id']}}">Edit</a>
+        </button>
+    {% endif %}
+    {% if "label:delete" in label["_links"] %}
+        <button>
+            <a href="labels?a=delete&id={{label['id']}}">Delete</a>
+        </button>
+    {% endif %}  
+    <button>
+        <a href="labels?a=cancel&id={{label['id']}}">Cancel</a>
+    </button>
+    </li>
+</ul>
+
+
+
+{% endblock%}

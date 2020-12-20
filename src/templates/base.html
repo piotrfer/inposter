@@ -15,15 +15,14 @@
         <ul class="menu">
             <li class="item"><a href="/">Home</a></li>
             <li class="item"><a href="/dashboard">Dashboard</a></li>
-            {% if session["login"] %}
+            {% if session["token"] %}
             <li class="item">
-
                 <a href="/sender/logout">Logout</a>
-            <li id="name">Logged as {{session["login"]}}</li>
+            <li id="name">Logged in as {{ session["login"] }}</li>
             </li>
             {% else %}
             <li class="item">
-                <a href="/sender/sign-up">Register</a>
+                <a href="{{ url_for('sender_signup')}}">Register</a>
             </li>
             <li class="item">
                 <a href="/sender/login">Login</a>

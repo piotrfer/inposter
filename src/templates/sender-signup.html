@@ -2,7 +2,7 @@
 {% block head %}
 <title>Register a sender</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth-pages.css') }}">
-<script src="{{ url_for('static', filename='script/sender-signup.js') }}"></script>
+<!--<script src="{{ url_for('static', filename='script/sender-signup.js') }}"></script> -->
 {% endblock %}
 {% block body %}
 <div class="content">
@@ -39,7 +39,7 @@
                 <input type="text" id="address" name="address" placeholder="address">
                 <p id="address-message"></p>
             </li>
-            <p>You already have an account? <button><a href="{{ url_for('sender_login_get')}}">Log in</a></button></p>
+            <p>You already have an account? <button><a href="{{ url_for('sender_login')}}">Log in</a></button></p>
             <li>
                 <input id="submit-form" type="submit" value="Sign Up">
                 <span id="submit-message"></span>
