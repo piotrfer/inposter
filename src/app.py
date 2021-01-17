@@ -52,7 +52,7 @@ def index():
 @app.route('/sender/auth0')
 def auth_auth0():
     print("0")
-    return auth0.authorize_redirect(redirect_uri='http://localhost:5000'+url_for('sender_auth0_callback'))
+    return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL)
 
 @app.route('/sender/auth0/callback')
 def sender_auth0_callback():
