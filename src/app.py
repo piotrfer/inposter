@@ -3,6 +3,8 @@ from os import getenv
 from flask import Flask, render_template, request, flash, make_response, url_for, session, send_from_directory
 import os
 import json, requests
+from authlib.integrations.flask_client import OAuth
+import time
 
 load_dotenv()
 SERVER_URL = getenv('SERVER_URL')
@@ -11,12 +13,27 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 app.secret_key = getenv('SECRET_KEY')
 
+oauth = OAuth(app)
+auth0 = oauth.register(
+    'auth0',
+    client_id=getenv('AUTH0_CLIENT_ID'),
+    client_secret=getenv('AUTH0_CLIENT_SECRET'),
+    api_base_url=getenv('AUTH0_BASE_URL'),
+    access_token_url=getenv('AUTH0_BASE_URL') + '/oauth/token',
+    authorize_url=getenv('AUTH0_BASE_URL') + '/authorize',
+    client_kwargs={
+        'scope': 'openid profile email',
+    },
+)
+
+
+
 service = {}
 user_token = ''
 
 @app.before_first_request
 def map_service():
-    data = json.loads(requests.get('https://inposter-service.herokuapp.com/').text)['_links']
+    data = json.loads(requests.get(SERVER_URL).text)['_links']
     service['sender'] = data['sender']['href']
     service['labels'] = data['labels']['href']
     service['parcels'] = data['parcels']['href']
@@ -31,6 +48,32 @@ def map_service():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/sender/auth0')
+def auth_auth0():
+    print("0")
+    return auth0.authorize_redirect(redirect_uri='http://localhost:5000'+url_for('sender_auth0_callback'))
+
+@app.route('/sender/auth0/callback')
+def sender_auth0_callback():
+    auth0.authorize_access_token()
+    resp = auth0.get('userinfo')
+    userinfo = resp.json()
+    auth0_token = userinfo
+    auth0_url = SERVER_URL + '/sender/auth0'
+    print(auth0_url)
+    r = requests.post(auth0_url, json=auth0_token)
+    print(r.status_code)
+    if r.status_code != 200:
+        if r.text != '' and r.status_code != 500:
+            flash(r.text)
+        return redirect(url_for('sender_login'))
+    else:
+        token = 'Bearer ' + json.loads(r.text)['token']
+        session["token"] = token
+        session["login"] = userinfo.get("name")
+        flash("You were logged in succesfuly")
+        return redirect(url_for('index')) 
 
 @app.route('/sender/sign-up', methods=['GET', 'POST'])
 def sender_signup():
@@ -165,4 +208,5 @@ def is_logged_in():
     return "token" in session
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True, port='5000')
+    #app.run(debug=False, port='0.0.0.0:5000')

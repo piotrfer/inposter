@@ -21,7 +21,11 @@
             <li>
                 <input type="submit" value="Sign In">
             </li>
+            <li>
+                <button type="button"><a href="{{ url_for('auth_auth0')}}">Log in with Auth0</a></button>
+            </li>
         </ul>
     </form>
+    
 </div>
 {% endblock %}
